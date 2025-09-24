@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Malaysia States Population Choropleth (Kaggle dataset)</title>
+  <title>Malaysia States Population Choropleth (2018)</title>
   <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
@@ -26,7 +26,14 @@
       },
       "transform": [
         {
-          "lookup": "State",
+          "calculate": "datum.State == 'Pulau Pinang' ? 'Penang' : " +
+                       "datum.State == 'WP Kuala Lumpur' ? 'Kuala Lumpur' : " +
+                       "datum.State == 'WP Putrajaya' ? 'Putrajaya' : " +
+                       "datum.State == 'WP Labuan' ? 'Labuan' : datum.State",
+          "as": "State_clean"
+        },
+        {
+          "lookup": "State_clean",
           "from": {
             "data": {
               "url": "https://raw.githubusercontent.com/cheeaun/republik-malaysia-geojson/master/malaysia-states.geojson",
