@@ -1,79 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>Malaysia States Population Choropleth (2018)</title>
-  <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
-  <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
-  <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
-    #map { max-width: 900px; margin: auto; }
-  </style>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.jsdelivr.net/npm/vega@5.20.2"></script>
+<script src="https://cdn.jsdelivr.net/npm/vega-lite@5.1.0"></script>
+<script src="https://cdn.jsdelivr.net/npm/vega-embed@6.17.0"></script>
+<script src="vega_lite_vis.js"></script>
+<title>First Vega-Lite graph </title>
 </head>
 <body>
-  <h2>Population Density by State — Malaysia (2018)</h2>
-  <p>Data source: Kaggle — Malaysia population by state (2018).</p>
-  <div id="map"></div>
-
-  <script>
-    const spec = {
-      "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-      "width": 800,
-      "height": 900,
-      "data": {
-        "url": "malaysia_population_state.csv"
-      },
-      "transform": [
-        {
-          "calculate": "datum.State == 'Pulau Pinang' ? 'Penang' : " +
-                       "datum.State == 'WP Kuala Lumpur' ? 'Kuala Lumpur' : " +
-                       "datum.State == 'WP Putrajaya' ? 'Putrajaya' : " +
-                       "datum.State == 'WP Labuan' ? 'Labuan' : datum.State",
-          "as": "State_clean"
-        },
-        {
-          "lookup": "State_clean",
-          "from": {
-            "data": {
-              "url": "https://raw.githubusercontent.com/cheeaun/republik-malaysia-geojson/master/malaysia-states.geojson",
-              "format": { "type": "geojson" }
-            },
-            "key": "properties.name",
-            "fields": ["geometry"]
-          }
-        }
-      ],
-      "projection": {
-        "type": "mercator",
-        "scale": 2200,
-        "center": [109.5, 3.5]
-      },
-      "mark": { "type": "geoshape", "stroke": "#333", "strokeWidth": 0.5 },
-      "encoding": {
-        "color": {
-          "field": "Pop_density",
-          "type": "quantitative",
-          "scale": { "scheme": "blues" },
-          "legend": { "title": "Population density\n(people/km²)" }
-        },
-        "tooltip": [
-          { "field": "State", "type": "nominal", "title": "State" },
-          { "field": "Population", "type": "quantitative", "title": "Population" },
-          { "field": "Area_km2", "type": "quantitative", "title": "Area (km²)" },
-          { "field": "Pop_density", "type": "quantitative", "title": "Density (people/km²)" }
-        ]
-      },
-      "title": {
-        "text": "Malaysia States Population Density (2018)",
-        "subtitle": "Source: Kaggle (DOSM 2018 data)"
-      },
-      "config": {
-        "view": { "stroke": "transparent" }
-      }
-    };
-
-    vegaEmbed('#map', spec, {actions: false}).catch(console.error);
-  </script>
+<h1>First Vega-Lite graph</h1>
+<div id="bar_chart">
+</div>
 </body>
 </html>
