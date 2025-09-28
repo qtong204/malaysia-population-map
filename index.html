@@ -7,12 +7,162 @@
 <script src="https://cdn.jsdelivr.net/npm/vega@5.20.2"></script>
 <script src="https://cdn.jsdelivr.net/npm/vega-lite@5.1.0"></script>
 <script src="https://cdn.jsdelivr.net/npm/vega-embed@6.17.0"></script>
-<script src="vega_lite_vis.js"></script>
-<title>First Vega-Lite graph </title>
+<title>Malaysia Population Map</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background-color: #f5f5f5;
+  }
+  #malaysia_map {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-top: 20px;
+  }
+  h1 {
+    color: #333;
+    text-align: center;
+  }
+  .description {
+    text-align: center;
+    color: #666;
+    margin-bottom: 20px;
+  }
+</style>
 </head>
 <body>
-<h1>First Vega-Lite graph</h1>
-<div id="bar_chart">
-</div>
+<h1>Malaysia Population Distribution by State</h1>
+<div class="description">Interactive choropleth map showing population distribution across Malaysian states</div>
+<div id="malaysia_map"></div>
+
+<script>
+  const spec = {
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+    "width": 800,
+    "height": 600,
+    "title": {
+      "text": "Population Distribution Across Malaysian States",
+      "fontSize": 18,
+      "anchor": "start"
+    },
+    "projection": {
+      "type": "mercator",
+      "scale": 2200,
+      "center": [109, 4],
+      "translate": [400, 300]
+    },
+    "layer": [
+      // Background layer - Malaysia outline
+      {
+        "data": {
+          "url": "https://raw.githubusercontent.com/qtong204/malaysia-population-map/refs/heads/main/malaysia.json",
+          "format": {"type": "topojson", "feature": "malaysia"}
+        },
+        "transform": [
+          {"filter": "datum.properties.NAME_1 != 'Labuan'"}
+        ],
+        "mark": {
+          "type": "geoshape",
+          "fill": "#f8f8f8",
+          "stroke": "white",
+          "strokeWidth": 1
+        }
+      },
+      // Main choropleth layer
+      {
+        "data": {
+          "url": "https://raw.githubusercontent.com/qtong204/malaysia-population-map/refs/heads/main/malaysia.json",
+          "format": {"type": "topojson", "feature": "malaysia"}
+        },
+        "transform": [
+          {"filter": "datum.properties.NAME_1 != 'Labuan'"},
+          {
+            "lookup": "properties.NAME_1",
+            "from": {
+              "data": {
+                "url": "https://raw.githubusercontent.com/qtong204/malaysia-population-map/refs/heads/main/Malaysia_population_state.csv"
+              },
+              "key": "state",
+              "fields": ["pop", "pop_18", "pop_60", "pop_12", "pop_5"]
+            }
+          }
+        ],
+        "mark": {
+          "type": "geoshape",
+          "stroke": "white",
+          "strokeWidth": 1,
+          "tooltip": true
+        },
+        "encoding": {
+          "color": {
+            "field": "pop",
+            "type": "quantitative",
+            "title": "Population",
+            "scale": {
+              "type": "sqrt",
+              "scheme": "blues"
+            },
+            "legend": {
+              "title": "Population",
+              "format": ",.0f"
+            }
+          },
+          "tooltip": [
+            {"field": "properties.NAME_1", "type": "nominal", "title": "State"},
+            {"field": "pop", "type": "quantitative", "title": "Total Population", "format": ","},
+            {"field": "pop_18", "type": "quantitative", "title": "Population (18+)", "format": ","},
+            {"field": "pop_60", "type": "quantitative", "title": "Population (60+)", "format": ","},
+            {"field": "pop_12", "type": "quantitative", "title": "Population (12-17)", "format": ","},
+            {"field": "pop_5", "type": "quantitative", "title": "Population (5-11)", "format": ","}
+          ]
+        }
+      },
+      // State labels
+      {
+        "data": {
+          "url": "https://raw.githubusercontent.com/qtong204/malaysia-population-map/refs/heads/main/malaysia.json",
+          "format": {"type": "topojson", "feature": "malaysia"}
+        },
+        "transform": [
+          {"filter": "datum.properties.NAME_1 != 'Labuan'"},
+          {
+            "lookup": "properties.NAME_1",
+            "from": {
+              "data": {
+                "url": "https://raw.githubusercontent.com/qtong204/malaysia-population-map/refs/heads/main/Malaysia_population_state.csv"
+              },
+              "key": "state",
+              "fields": ["pop"]
+            }
+          },
+          {"calculate": "centroid(datum)", "as": "centroid"}
+        ],
+        "mark": {
+          "type": "text",
+          "fontSize": 9,
+          "fontWeight": "bold",
+          "fill": "#333"
+        },
+        "encoding": {
+          "longitude": {"field": "centroid[0]", "type": "quantitative"},
+          "latitude": {"field": "centroid[1]", "type": "quantitative"},
+          "text": {"field": "properties.NAME_1", "type": "nominal"},
+          "tooltip": [
+            {"field": "properties.NAME_1", "type": "nominal", "title": "State"},
+            {"field": "pop", "type": "quantitative", "title": "Population", "format": ","}
+          ]
+        }
+      }
+    ],
+    "config": {
+      "view": {"stroke": "transparent"},
+      "background": "#f5f5f5"
+    }
+  };
+
+  vegaEmbed('#malaysia_map', spec);
+</script>
 </body>
 </html>
